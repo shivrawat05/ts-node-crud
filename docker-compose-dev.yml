@@ -1,0 +1,184 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_dev
+    restart: always
+    env_file:
+      - .env.dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_dev
+    restart: always
+    ports:
+      - "6379:6379"
+    env_file:
+      - .env.dev
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ts_app_dev
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/src
+      - /src/node_modules
+    command: npm run dev
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_dev
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@dev.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False" # allows multiple users locally
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pgdata_dev:
+  pgadmin_data:
+# # Pull latest code from main
+# git checkout main
+# git pull origin main
+
+# # Build the Docker image with latest code
+# docker build -t yourusername/nodecrud:latest .
+
+# # Run tests to ensure everything works
+# docker run --rm yourusername/nodecrud:latest npm test
+
+# # Push the image to Docker Hub
+# docker push yourusername/nodecrud:latest
+
+#II--> ok let any new develoepr come and pull image will he need to pull code from github or pull form docker directly?
+# Perfect — this is an important distinction. The answer depends on the purpose of the developer: development (editing code) vs just running the app (testing or deployment).
+
+# 1️⃣ Scenario: New developer wants to develop / change code
+
+# If the developer wants to edit the application, they need the source code.
+
+# They will pull the code from GitHub, not just the Docker image.
+
+# Reason:
+
+# The Docker image contains a snapshot of the code at the time it was built.
+
+# Any changes they make inside the container won’t automatically update the image.
+
+# For active development, developers mount the code via volumes so changes are live.
+
+# Typical workflow:
+
+# git clone https://github.com/your-org/nodecrud.git
+# cd nodecrud
+# docker-compose -f docker-compose-dev.yml up --build
+
+# They now have both the latest code and a local dev image.
+
+# 2️⃣ Scenario: New developer wants to just run/test the app
+
+# If the developer just wants to run the latest working app, without changing code:
+
+# They can pull the Docker image directly from Docker Hub:
+
+# docker pull yourusername/nodecrud:latest
+# docker run -p 3000:3000 yourusername/nodecrud:latest
+
+# ✅ No need to pull source code from GitHub.
+
+# They are using the prebuilt image which already contains the latest merged code.
+
+#III -> ok kmeans when new developer come for developemt he pull github code and build compos , so he dont need to do npm i?
+
+# How it works with your Dockerfile and volumes
+
+# Suppose your Dockerfile.dev looks like this (typical for Node.js/TypeScript dev):
+
+# FROM node:20-alpine
+
+# WORKDIR /src
+
+# COPY package*.json ./
+# RUN npm install
+
+# COPY . .
+# CMD ["npm", "run", "dev"]
+
+# Step by step:
+
+# COPY package*.json ./ → copies package.json and package-lock.json into the image.
+
+# RUN npm install → installs all dependencies inside the container image.
+
+# COPY . . → copies all your source code into the image.
+
+# ✅ After docker-compose up --build, the container already has all npm dependencies installed.
+
+# 2️⃣ Why the developer doesn’t need npm i locally
+
+# Your Compose file mounts the project folder as a volume:
+
+# volumes:
+#   - .:/src
+#   - /src/node_modules
+
+# ./src → your local code
+
+# /src/node_modules → the container keeps its node_modules separate
+
+# This means:
+
+# The container already has dependencies.
+
+# Any new code changes automatically use the installed packages.
+
+# Developer doesn’t need npm i on their local machine.
+
+# 3️⃣ When might the developer need npm i manually?
+
+# If you are not using Docker volumes, and the developer wants to run the app locally without Docker, they would need npm install.
+
+# If new dependencies are added in package.json, rebuilding the image (--build) will run npm install again inside the container.
+
+# 4️⃣ TL;DR Workflow for a new developer
+
+# Clone GitHub repo
+
+# Copy .env file
+
+# Run:
+
+# docker-compose -f docker-compose-dev.yml up --build
+
+# ✅ Container builds
+
+# ✅ Dependencies installed inside the container
+
+# ✅ Live code updates via volume mount
+
+# ❌ No need to run npm install locally
+
+# 💡 Industry Practice (MNCs):
+
+# Developers don’t need Node.js or npm installed locally for dev if using Docker.
+
+# Docker container handles all dependencies.
+
+# Local code changes are reflected instantly via volumes.
