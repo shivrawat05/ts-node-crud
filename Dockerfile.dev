@@ -1,19 +1,35 @@
-# Development Dockerfile
-FROM node:22-alpine AS dev
+# # Development Dockerfile
+# FROM node:22-alpine AS dev
+
+# WORKDIR /src
+
+# # Copy package files
+# COPY package*.json ./
+
+# # Install all dependencies
+# RUN npm install
+
+# # Copy source code
+# COPY . .
+
+# # Expose port
+# EXPOSE 3000
+
+# # Run dev server (auto-reload)
+# CMD ["npm", "run", "dev"]
+
+
+
+FROM node:22-alpine as dev
 
 WORKDIR /src
 
-# Copy package files
 COPY package*.json ./
 
-# Install all dependencies
 RUN npm install
 
-# Copy source code
 COPY . .
 
-# Expose port
 EXPOSE 3000
 
-# Run dev server (auto-reload)
-CMD ["npm", "run", "dev"]
+CMD [ "npm", "run", "dev" ]

@@ -1,7 +1,7 @@
 // src/config.ts
 import { config } from "dotenv";
 import { resolve } from "path";
-import { existsSync, readFileSync } from "fs";
+import { existsSync } from "fs";
 
 const envFile =
   process.env.NODE_ENV === "production"
@@ -10,12 +10,16 @@ const envFile =
 
 const envPath = resolve(process.cwd(), envFile);
 
-console.log("Looking for env file at:", envPath);
-console.log("File exists:", existsSync(envPath));
-
-if (existsSync(envPath)) {
-  console.log("File contents:", readFileSync(envPath, "utf-8"));
+if (!existsSync(envPath)) {
+  console.error(`❌ Env file not found: ${envPath}`);
+  process.exit(1); // fail fast
 }
 
 const result = config({ path: envPath });
-console.log("Dotenv result:", result);
+
+if (result.error) {
+  console.error("❌ Failed to load env file", result.error);
+  process.exit(1);
+}
+
+console.log(`✅ Loaded environment: ${envFile}`);

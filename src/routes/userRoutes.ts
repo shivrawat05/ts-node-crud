@@ -15,5 +15,7 @@ router.put("/user/:id", updateUser);
 router.get("/user", cacheMiddleware, getUsers);
 router.get("/user/:id", getUserById);
 router.delete("/user/:id", deleteUser);
-
+router.get("/user/health", (req, res) => {
+  res.send("OK");
+});
 export default router;

@@ -1,8 +1,13 @@
-// src/server.ts
-import "./config"; // MUST come first
-import app from "./app"; // app imports db.ts internally
+import "./config"; // now env is loaded
+import dotenv from "dotenv";
+dotenv.config({
+  path: ".env.development", // or ".env"
+});
+
+import app from "./app";
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-);
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
