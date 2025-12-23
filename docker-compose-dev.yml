@@ -1,10 +1,59 @@
+# services:
+#   postgres:
+#     image: postgres:16-alpine
+#     container_name: postgres_dev
+#     restart: always
+#     env_file:
+#       - .env.dev # to fetch current port of the service like 8000, 2000, 5143 and used in port mapping
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - pgdata_dev:/var/lib/postgresql/data
+
+#   redis:
+#     image: redis:7-alpine
+#     container_name: redis_dev
+#     restart: always
+#     ports:
+#       - "6379:6379"
+#     env_file:
+#       - .env.dev
+
+#   app:
+#     build: #  In Docker Compose, the build: section is used when you want Docker to build an image instead of pulling a prebuilt one from Docker Hub.
+#       context: . # context → where to look for files (the build directory)
+#       dockerfile: Dockerfile.dev #dockerfile → which Dockerfile to use (optional if the default name Dockerfile is used)
+#     container_name: ts_app_dev
+#     depends_on:
+#       - postgres
+#       - redis
+#     env_file:
+#       - .env.dev
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - .:/src
+#       - /src/node_modules
+#     command: npm run dev
+
+#   pgadmin:
+#     image: dpage/pgadmin4:latest
+#     container_name: pgadmin_dev
+#     restart: always
+#     ports:
+#       - "5050:80"
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: admin@dev.com
+#       PGADMIN_DEFAULT_PASSWORD: admin123
+#       PGADMIN_CONFIG_SERVER_MODE: "False" # allows multiple users locally
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: postgres_dev
     restart: always
     env_file:
-      - .env.dev # to fetch current port of the service like 8000, 2000, 5143 and used in port mapping
+      - .env.development
     ports:
       - "5432:5432"
     volumes:
@@ -17,18 +66,18 @@ services:
     ports:
       - "6379:6379"
     env_file:
-      - .env.dev
+      - .env.development
 
   app:
-    build: #  In Docker Compose, the build: section is used when you want Docker to build an image instead of pulling a prebuilt one from Docker Hub.
-      context: . # context → where to look for files (the build directory)
-      dockerfile: Dockerfile.dev #dockerfile → which Dockerfile to use (optional if the default name Dockerfile is used)
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: ts_app_dev
     depends_on:
       - postgres
       - redis
     env_file:
-      - .env.dev
+      - .env.development
     ports:
       - "3000:3000"
     volumes:
@@ -45,4 +94,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@dev.com
       PGADMIN_DEFAULT_PASSWORD: admin123
-      PGADMIN_CONFIG_SERVER_MODE: "False" # allows multiple users locally
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+
+volumes:
+  pgdata_dev:
