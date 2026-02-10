@@ -55,7 +55,7 @@ docker run -p 3000:3000 yourusername/nodecrud:latest
 They are using the prebuilt image which already contains the latest merged code.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-III -> ok kmeans when new developer come for developemt he pull github code and build compos , so he dont need to do npm i?
+III -> ok kmeans when new developer come for developemt he pull github code and build compose , so he dont need to do npm i?
 
 How it works with your Dockerfile and volumes
 
@@ -165,7 +165,11 @@ Run:
 
 psql -h localhost -U postgres -d testdb -f "C:\path\to\your\dump.sql"
 
--h localhost → host
+// if rds db is private do this coomand and use bastion host written by me in notebbok
+psql -h localhost -p 5433 -U postgres -d ecsrds -f "C:\Users\L75\Desktop\output.sql"
+
+- Note --> use localhost when connection AWS RDS in Localpgadmin
+  -h localhost → host
 
 -U postgres → user (your .env says postgres)
 
